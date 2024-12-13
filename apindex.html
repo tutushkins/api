@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Winx Characters</title>
+    <!-- Подключение Bootstrap -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5+5hb5gV/9I1cnfrg3E7OW8eLLZQ/x6odj/wl+BX"
+      crossorigin="anonymous"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa;
+        padding: 20px;
+      }
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #343a40;
+      }
+      #data-form {
+        max-width: 500px;
+        margin: 0 auto 20px;
+      }
+      ul {
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 0;
+      }
+      li {
+        list-style-type: none;
+        padding: 10px;
+        margin-bottom: 10px;
+        background-color: #ffffff;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      #data-title {
+        border: 2px solid #6c757d;
+        border-radius: 5px;
+        padding: 10px;
+        transition: border-color 0.3s;
+      }
+      #data-title:focus {
+        border-color: #007bff;
+        outline: none;
+      }
+      button {
+        padding: 10px 20px;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Winx Characters</h1>
+    <form id="data-form" class="d-flex gap-2">
+      <input
+        type="text"
+        id="data-title"
+        class="form-control"
+        placeholder="Enter character name"
+        required
+      />
+      <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+    <ul id="data-list" class="p-0"></ul>
+
+    <script src="server.js">
+      const form = document.getElementById("data-form");
+      const dataList = document.getElementById("data-list");
+
+      // Обработчик отправки формы
+      form.addEventListener("submit", async function (event) {
+        event.preventDefault(); // Предотвращаем перезагрузку страницы
+
+        // Получаем введенное имя
+        const title = document.getElementById("data-title").value;
+
+        // Очищаем список перед добавлением новой информации
+        dataList.innerHTML = "";
+
+        try {
+          // Делаем запрос к API (замени URL на свой API, если требуется)
+          const response = await fetch(
+            `http://localhost:3000/winx?name=${title}`
+          );
+
+          if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+          }
+
+          const data = await response.json();
+
+          if (data && data.info) {
+            // Если персонаж найден, добавляем информацию в список
+            const listItem = document.createElement("li");
+            listItem.textContent = `${title}: ${data.info}`;
+            dataList.appendChild(listItem);
+          } else {
+            // Если персонаж не найден, выводим сообщение об ошибке
+            const listItem = document.createElement("li");
+            listItem.textContent = `Character "${title}" not found.`;
+            listItem.style.color = "red";
+            dataList.appendChild(listItem);
+          }
+        } catch (error) {
+          // Обрабатываем ошибку запроса
+          const listItem = document.createElement("li");
+          listItem.textContent = `Error fetching data: ${error.message}`;
+          listItem.style.color = "red";
+          dataList.appendChild(listItem);
+        }
+
+        // Очищаем поле ввода
+        form.reset();
+      });
+    </script>
+  </body>
+</html>
